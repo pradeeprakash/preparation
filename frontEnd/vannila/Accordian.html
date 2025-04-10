@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vanilla JS Accordion</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+      .accordion {
+        width: 400px;
+        margin: 20px auto;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        overflow: hidden;
+      }
+      .accordion-item {
+        border-bottom: 1px solid #ddd;
+      }
+      .accordion-header {
+        background: #f5f5f5;
+        padding: 10px;
+        cursor: pointer;
+        font-weight: bold;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .accordion-header:hover {
+        background: #e0e0e0;
+      }
+      .accordion-content {
+        padding: 10px;
+        display: none;
+      }
+      .open .accordion-content {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="accordion" id="accordion">
+      <!-- Dynamic Accordion Items will be inserted here -->
+    </div>
+
+    <script>
+      const data = [
+        {
+          title: "What is JavaScript?",
+          content: "JavaScript is a programming language for web development.",
+        },
+        {
+          title: "What is an accordion?",
+          content: "An accordion is a UI component that expands and collapses.",
+        },
+        {
+          title: "Why use an accordion?",
+          content: "To present information in a structured and readable way.",
+        },
+      ];
+
+      function createAccordion(data) {
+        const accordion = document.getElementById("accordion");
+
+        data.forEach((item, index) => {
+          const accordionItem = document.createElement("div");
+          accordionItem.classList.add("accordion-item");
+
+          const header = document.createElement("div");
+          header.classList.add("accordion-header");
+          header.innerHTML = `${item.title} <span>+</span>`;
+
+          const content = document.createElement("div");
+          content.classList.add("accordion-content");
+          content.textContent = item.content;
+
+          header.addEventListener("click", function () {
+            const isOpen = accordionItem.classList.contains("open");
+
+            // Close all other items
+            document.querySelectorAll(".accordion-item").forEach((el) => {
+              el.classList.remove("open");
+              el.querySelector(".accordion-content").style.display = "none";
+              el.querySelector(".accordion-header span").textContent = "+";
+            });
+
+            // Toggle the current item
+            if (!isOpen) {
+              accordionItem.classList.add("open");
+              content.style.display = "block";
+              header.querySelector("span").textContent = "−";
+            }
+          });
+
+          accordionItem.appendChild(header);
+          accordionItem.appendChild(content);
+          accordion.appendChild(accordionItem);
+        });
+      }
+
+      createAccordion(data);
+    </script>
+  </body>
+</html>

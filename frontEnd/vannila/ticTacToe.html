@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tic Tac Toe</title>
+    <style>
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #f0f0f0;
+        font-family: Arial, sans-serif;
+      }
+
+      .tic-tac-toe {
+        display: grid;
+        gap: 5px;
+      }
+
+      .tic-tac-toe .cell {
+        width: 100px;
+        height: 100px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #fff;
+        border: 2px solid #333;
+        font-size: 36px;
+        font-weight: bold;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .tic-tac-toe .cell.taken {
+        pointer-events: none;
+      }
+
+      .message {
+        margin-top: 20px;
+        font-size: 24px;
+        font-weight: bold;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <input
+        type="number"
+        id="gridSize"
+        placeholder="Enter grid size (e.g., 3)"
+        min="3"
+        max="10"
+        style="margin-bottom: 20px; padding: 5px; font-size: 16px"
+      />
+      <button
+        id="startGame"
+        style="padding: 5px 15px; font-size: 16px; cursor: pointer"
+      >
+        Start Game
+      </button>
+      <div class="tic-tac-toe" id="ticTacToe"></div>
+      <div class="message" id="message"></div>
+    </div>
+
+    <script>
+      const board = document.getElementById("ticTacToe");
+      const message = document.getElementById("message");
+      const gridSizeInput = document.getElementById("gridSize");
+      const startGameButton = document.getElementById("startGame");
+
+      let currentPlayer = "X";
+      let gridSize = 3;
+      let cells;
+
+      const checkWinner = () => {
+        const winningCombinations = [];
+
+        // Rows
+        for (let i = 0; i < gridSize; i++) {
+          winningCombinations.push(
+            Array.from({ length: gridSize }, (_, j) => i * gridSize + j)
+          );
+        }
+
+        // Columns
+        for (let i = 0; i < gridSize; i++) {
+          winningCombinations.push(
+            Array.from({ length: gridSize }, (_, j) => j * gridSize + i)
+          );
+        }
+
+        // Diagonal 1
+        winningCombinations.push(
+          Array.from({ length: gridSize }, (_, i) => i * (gridSize + 1))
+        );
+
+        // Diagonal 2
+        winningCombinations.push(
+          Array.from({ length: gridSize }, (_, i) => (i + 1) * (gridSize - 1))
+        );
+
+        for (const combination of winningCombinations) {
+          const [first, ...rest] = combination;
+          if (
+            cells[first] &&
+            rest.every((index) => cells[index] === cells[first])
+          ) {
+            return cells[first];
+          }
+        }
+
+        return cells.includes(null) ? null : "Draw";
+      };
+
+      const handleClick = (index, cellElement) => {
+        if (cells[index] || checkWinner()) return;
+
+        cells[index] = currentPlayer;
+        cellElement.textContent = currentPlayer;
+        cellElement.classList.add("taken");
+
+        const winner = checkWinner();
+        if (winner) {
+          message.textContent =
+            winner === "Draw" ? "It's a Draw!" : `Player ${winner} Wins!`;
+          board.style.pointerEvents = "none"; // Disable further clicks
+        } else {
+          currentPlayer = currentPlayer === "X" ? "O" : "X";
+          message.textContent = `Player ${currentPlayer}'s Turn`;
+        }
+      };
+
+      const initializeBoard = () => {
+        board.innerHTML = "";
+        board.style.gridTemplateColumns = `repeat(${gridSize}, 100px)`;
+        board.style.gridTemplateRows = `repeat(${gridSize}, 100px)`;
+        cells = Array(gridSize * gridSize).fill(null);
+
+        for (let i = 0; i < gridSize * gridSize; i++) {
+          const cell = document.createElement("div");
+          cell.className = "cell";
+          cell.addEventListener("click", () => handleClick(i, cell));
+          board.appendChild(cell);
+        }
+
+        message.textContent = `Player X's Turn`;
+        board.style.pointerEvents = "auto";
+      };
+
+      startGameButton.addEventListener("click", () => {
+        const size = parseInt(gridSizeInput.value);
+        if (!isNaN(size) && size >= 3 && size <= 10) {
+          gridSize = size;
+          initializeBoard();
+        } else {
+          alert("Please enter a valid grid size between 3 and 10.");
+        }
+      });
+
+      // Initialize with default size
+      initializeBoard();
+    </script>
+  </body>
+</html>
